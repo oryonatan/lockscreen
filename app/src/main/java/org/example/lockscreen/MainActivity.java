@@ -6,6 +6,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -14,16 +15,30 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         //Set up our Lockscreen
-        makeFullScreen();
-        startService(new Intent(this,LockScreenService.class));
+        startService(new Intent(this, LockScreenService.class));
 
-        setContentView(R.layout.activity_main);
+        //Check if being called from launcher or from lock screen
+        if (this.getIntent().hasExtra("fromlockscreen"))
+        {
+            makeFullScreen();
+            setContentView(R.layout.locksceen);
+        }
+        else{
+            if(0 != (getIntent().getFlags() & (Intent.FLAG_FROM_BACKGROUND |
+                    Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY) ))
+            {
+                finish();
+            }
+            setContentView(R.layout.activity_main_menu);
+        }
+
     }
 
     /**
      * A simple method that sets the screen to fullscreen.  It removes the Notifications bar,
      *   the Actionbar and the virtual keys (if they are on the phone)
      */
+
     public void makeFullScreen() {
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
@@ -38,11 +53,17 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        return; //Do nothing!
+
     }
 
     public void unlockScreen(View view) {
         //Instead of using finish(), this totally destroys the process
         android.os.Process.killProcess(android.os.Process.myPid());
     }
+
+//    public void onStop(){
+//        if (!this.getIntent().hasExtra("fromlockscreen")){
+//            finish();
+//        }
+//    }
 }

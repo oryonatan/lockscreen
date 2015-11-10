@@ -16,6 +16,7 @@ public class LockScreenService extends Service {
         return null;
     }
 
+
     @Override
     @SuppressWarnings("deprecation")
     public void onCreate() {
