@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<transition xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- use whatever drawables you want, gradients, shapes etc-->
+    <item android:drawable="@drawable/round_button" />
+    <item android:drawable="@drawable/round_button_pressed" />
+</transition>

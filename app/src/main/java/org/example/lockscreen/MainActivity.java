@@ -9,7 +9,7 @@ import android.view.WindowManager;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
-
+    public static final String SHAPES_DIR = "shapes/";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,7 +29,9 @@ public class MainActivity extends Activity {
             {
                 finish();
             }
-            setContentView(R.layout.activity_main_menu);
+            //TODO: check if we should load welcome screen
+            startActivity(new Intent(getApplicationContext(),Welcome.class));
+
         }
 
     }
