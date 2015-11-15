@@ -21,7 +21,7 @@ public class MainActivity extends Activity {
         if (this.getIntent().hasExtra("fromlockscreen"))
         {
             makeFullScreen();
-            setContentView(R.layout.locksceen);
+            startActivity(new Intent(getApplicationContext(),LockScreen.class));
         }
         else{
             if(0 != (getIntent().getFlags() & (Intent.FLAG_FROM_BACKGROUND |

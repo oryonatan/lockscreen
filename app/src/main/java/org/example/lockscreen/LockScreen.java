@@ -33,31 +33,33 @@ public class LockScreen extends Activity implements SensorEventListener {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         findViewById(R.id.btn_ls_touchToUnlcok).setOnTouchListener(otl_tryToUnlock);
     }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                //start gathring
-                sensorLog = new ArrayList<>();
-                sensingStartTime = 0;
-                sensorManager.registerListener
-                        (LockScreen.this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
-                break;
-            case MotionEvent.ACTION_UP:
-                //stop gathering
-                Log.d("Debug::", "Up");
-                sensorManager.unregisterListener(LockScreen.this);
-                if (sensorLog.size() > 150) {
-                    double[][] recordedGesture = GestureRecognizer.prepForComapre(sensorLog);
-                    if (isCloseEnough(recordedGesture)){
-                        //TODO: respond
+    private View.OnTouchListener otl_tryToUnlock = new View.OnTouchListener() {
+        @Override
+        public boolean onTouch(View v, MotionEvent event) {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                    //start gathring
+                    sensorLog = new ArrayList<>();
+                    sensingStartTime = 0;
+                    sensorManager.registerListener
+                            (LockScreen.this, accelerometer, SensorManager.SENSOR_DELAY_FASTEST);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    //stop gathering
+                    Log.d("Debug::", "Up");
+                    sensorManager.unregisterListener(LockScreen.this);
+                    if (sensorLog.size() > 150) {
+                        double[][] recordedGesture = GestureRecognizer.prepForComapre(sensorLog);
+                        if (isCloseEnough(recordedGesture)) {
+                            //TODO: respond
+                            finish();
+                        }
                     }
-                }
-                break;
+                    break;
+            }
+            return true;
         }
-        return true;
-    }
+    };
 
     private boolean isCloseEnough(double[][] recordedGesture) {
         FileInputStream c1fis, c2fis, c3fis;
@@ -75,9 +77,10 @@ public class LockScreen extends Activity implements SensorEventListener {
             curve2 = (double[][]) c2ois.readObject();
             curve3 = (double[][]) c3ois.readObject();
 
-            double avgDist = (GestureRecognizer.compareCleanArrays(recordedGesture, curve1) +
-                    GestureRecognizer.compareCleanArrays(recordedGesture, curve2) +
-                    GestureRecognizer.compareCleanArrays(recordedGesture, curve3)) / 3;
+            double avgDist =
+                    (       GestureRecognizer.compareCleanArrays(recordedGesture, curve1) +
+                            GestureRecognizer.compareCleanArrays(recordedGesture, curve2) +
+                            GestureRecognizer.compareCleanArrays(recordedGesture, curve3)) / 3;
 
             File dirFiles[] = new File(this.getFilesDir(), MainActivity.SHAPES_DIR).listFiles();
             double initialDist = 0;
@@ -88,12 +91,12 @@ public class LockScreen extends Activity implements SensorEventListener {
                     break;
                 }
             }
-            if (initialDist / avgDist > 1.6)
+            if (initialDist / avgDist < 1.6)
                 return true;
             return false;
-        } catch (Exception e){
-                return true;
-            }
+        } catch (Exception e) {
+            return true;
+        }
     }
 
 
