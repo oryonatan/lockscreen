@@ -355,7 +355,7 @@ public class GestureRecognizer {
                 dist += Math.abs(interpolated[0][i][j] - interpolated[1][i][j]);
             }
         }
-        return dist/3 * Math.pow(dtwkDist, 10)  ;
+        return dist/3  ;
     }
 
 

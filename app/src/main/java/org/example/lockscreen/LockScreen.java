@@ -18,6 +18,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class LockScreen extends Activity implements SensorEventListener {
     private ArrayList<Pair<Long, double[]>> sensorLog;
@@ -33,6 +34,7 @@ public class LockScreen extends Activity implements SensorEventListener {
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         findViewById(R.id.btn_ls_touchToUnlcok).setOnTouchListener(otl_tryToUnlock);
     }
+
     private View.OnTouchListener otl_tryToUnlock = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
@@ -66,19 +68,20 @@ public class LockScreen extends Activity implements SensorEventListener {
         ObjectInputStream c1ois, c2ois, c3ois;
         double[][] curve1, curve2, curve3;
         try {
-            c1fis = new FileInputStream(new File(MainActivity.SHAPES_DIR + "c1"));
+            c1fis = new FileInputStream(new File(this.getFilesDir(), MainActivity.SHAPES_DIR + "c0"));
+            c2fis = new FileInputStream(new File(this.getFilesDir(), MainActivity.SHAPES_DIR + "c1"));
+            c3fis = new FileInputStream(new File(this.getFilesDir(), MainActivity.SHAPES_DIR + "c2"));
 
-            c2fis = new FileInputStream(new File(MainActivity.SHAPES_DIR + "c2"));
-            c3fis = new FileInputStream(new File(MainActivity.SHAPES_DIR + "c3"));
             c1ois = new ObjectInputStream(c1fis);
             c2ois = new ObjectInputStream(c2fis);
             c3ois = new ObjectInputStream(c3fis);
+
             curve1 = (double[][]) c1ois.readObject();
             curve2 = (double[][]) c2ois.readObject();
             curve3 = (double[][]) c3ois.readObject();
 
             double avgDist =
-                    (       GestureRecognizer.compareCleanArrays(recordedGesture, curve1) +
+                    (GestureRecognizer.compareCleanArrays(recordedGesture, curve1) +
                             GestureRecognizer.compareCleanArrays(recordedGesture, curve2) +
                             GestureRecognizer.compareCleanArrays(recordedGesture, curve3)) / 3;
 
@@ -91,19 +94,32 @@ public class LockScreen extends Activity implements SensorEventListener {
                     break;
                 }
             }
-            if (initialDist / avgDist < 1.6)
+            System.out.println("Original distance " + Double.toString(initialDist));
+            System.out.println("Found distance " + Double.toString(avgDist));
+            System.out.println("Ratio" + Double.toString( avgDist/initialDist));
+
+            if (avgDist / initialDist < 1.6)
                 return true;
             return false;
         } catch (Exception e) {
+            e.printStackTrace();
+
             return true;
         }
     }
 
-
     @Override
     public void onSensorChanged(SensorEvent event) {
+        if (event.sensor == accelerometer) {
+            if (sensingStartTime == 0) sensingStartTime = event.timestamp;
+            System.out.println(String.valueOf(event.timestamp));
+            System.out.println("Sensor data : " + Arrays.toString(event.values));
+            sensorLog.add(new Pair<>(event.timestamp,
+                    new double[]{event.values[0], event.values[1], event.values[2]}));
 
+        }
     }
+
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {

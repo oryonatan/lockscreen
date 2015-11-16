@@ -54,7 +54,8 @@ public class recordShape extends Activity implements SensorEventListener {
         File shapeDir = new File(activity.getFilesDir(), MainActivity.SHAPES_DIR);
         shapeDir.mkdirs();
         try {
-            FileUtils.cleanDirectory(shapeDir);
+            if (curveCount==0)
+                FileUtils.cleanDirectory(shapeDir);
         }catch (Exception e){};
 
         String fileName = "c" + Integer.toString(curveCount);
@@ -100,7 +101,7 @@ public class recordShape extends Activity implements SensorEventListener {
                         if (curveCount== 3){
                             try {
                                 double dist = getInitialDistance();
-                                new File(MainActivity.SHAPES_DIR + "d" + Double.toString(dist)).createNewFile();
+                                new File(getApplicationContext().getFilesDir(),MainActivity.SHAPES_DIR + "d" + Double.toString(dist)).createNewFile();
                             }catch (Exception e){}
                             startActivity(new Intent(getApplicationContext(),MainMenu.class));
                         }
@@ -118,8 +119,8 @@ public class recordShape extends Activity implements SensorEventListener {
         FileInputStream c1fis,c2fis ;
         ObjectInputStream c1ois, c2ois;
         double[][] curve1 , curve2;
-        c1fis = new FileInputStream(new File(MainActivity.SHAPES_DIR+"c1"));
-        c2fis = new FileInputStream(new File(MainActivity.SHAPES_DIR+"c2"));
+        c1fis = new FileInputStream(new File(this.getFilesDir(),MainActivity.SHAPES_DIR+"c1"));
+        c2fis = new FileInputStream(new File(this.getFilesDir(),MainActivity.SHAPES_DIR+"c2"));
         c1ois = new ObjectInputStream(c1fis);
         c2ois = new ObjectInputStream(c2fis);
         curve1 = (double[][])c1ois.readObject();

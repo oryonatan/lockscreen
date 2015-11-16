@@ -12,11 +12,11 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppBaseTheme" >
+        android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
         <activity
             android:name=".MainActivity"
-            android:excludeFromRecents="true"
             android:label="@string/app_name"
+            android:excludeFromRecents="true"
             android:noHistory="true"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -51,6 +51,8 @@
         <activity
             android:name=".Welcome"
             android:label="@string/title_activity_welcome"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
             android:screenOrientation="portrait" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -61,16 +63,23 @@
         <activity
             android:name=".aFewTips"
             android:label="@string/title_activity_a_few_tips"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".recordShape"
             android:label="@string/title_activity_record_shape"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".LockScreen"
-            android:label="@string/title_activity_lock_screen" >
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:label="@string/title_activity_lock_screen"
+            android:screenOrientation="portrait" >
         </activity>
     </application>
 
