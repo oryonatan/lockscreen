@@ -1,15 +1,19 @@
 package org.example.lockscreen;
 
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
 import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.Toast;
 
 import java.io.File;
@@ -19,8 +23,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import static android.view.WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
 
-public class LockScreen extends Activity implements SensorEventListener {
+public class LockScreen extends Activity implements SensorEventListener  {
     private ArrayList<Pair<Long, double[]>> sensorLog;
     private SensorManager sensorManager;
     private Sensor accelerometer;
@@ -29,10 +34,20 @@ public class LockScreen extends Activity implements SensorEventListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        makeFullScreen();
         setContentView(R.layout.activity_lock_screen);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         findViewById(R.id.btn_ls_touchToUnlcok).setOnTouchListener(otl_tryToUnlock);
+        Button goToPin = (Button)findViewById(R.id.btn_ls_setPin);
+        goToPin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(
+                        new Intent(getApplicationContext(),PinEntry.class).putExtra("tryPin",true)
+                );
+            }
+        });
     }
 
     private View.OnTouchListener otl_tryToUnlock = new View.OnTouchListener() {
@@ -123,6 +138,25 @@ public class LockScreen extends Activity implements SensorEventListener {
 
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
     }
+
+    @Override
+    public void onBackPressed() {
+        return;
+    }
+
+
+
+    public void makeFullScreen() {
+        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        if(Build.VERSION.SDK_INT < 19) { //View.SYSTEM_UI_FLAG_IMMERSIVE is only on API 19+
+            this.getWindow().getDecorView()
+                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+        } else {
+            this.getWindow().getDecorView()
+                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
+        }
+    }
+
 }
