@@ -10,10 +10,12 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
 import android.util.Pair;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.Toast;
 
 import java.io.File;
@@ -25,17 +27,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import static android.view.WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
 
-public class LockScreen extends Activity implements SensorEventListener  {
+
+public class LockScreen extends Activity implements SensorEventListener {
     private ArrayList<Pair<Long, double[]>> sensorLog;
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private long sensingStartTime = 0;
+    private HomeKeyLocker mHomeKeyLocker;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        makeFullScreen();
         setContentView(R.layout.activity_lock_screen);
+        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
         findViewById(R.id.btn_ls_touchToUnlcok).setOnTouchListener(otl_tryToUnlock);
@@ -49,6 +54,7 @@ public class LockScreen extends Activity implements SensorEventListener  {
             }
         });
     }
+
 
     private View.OnTouchListener otl_tryToUnlock = new View.OnTouchListener() {
         @Override
@@ -159,4 +165,10 @@ public class LockScreen extends Activity implements SensorEventListener  {
         }
     }
 
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mHomeKeyLocker =null;
+    }
 }
