@@ -1,5 +1,7 @@
 package org.example.lockscreen;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -8,6 +10,7 @@ import android.os.Bundle;
 import android.app.Activity;
 import android.util.Log;
 import android.util.Pair;
+import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Toast;
@@ -17,6 +20,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -29,6 +33,11 @@ public class LockScreen extends Activity implements SensorEventListener {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        File firstCurve = new File(this.getFilesDir(), MainActivity.SHAPES_DIR + "c0");
+        if (!getIntent().hasExtra("fromlockscreen")||
+                ! firstCurve.exists()){
+            finish();
+        }
         setContentView(R.layout.activity_lock_screen);
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
@@ -119,6 +128,55 @@ public class LockScreen extends Activity implements SensorEventListener {
 
         }
     }
+
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        ActivityManager activityManager = (ActivityManager) getApplicationContext()
+                .getSystemService(Context.ACTIVITY_SERVICE);
+
+        activityManager.moveTaskToFront(getTaskId(), 0);
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if(keyCode == KeyEvent.KEYCODE_HOME)
+        {
+            Log.i("Home Button", "Clicked");
+        }
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            return true;
+        }
+        return false;
+    }
+
+
+    @Override
+    public void onWindowFocusChanged(boolean hasFocus) {
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                Object sbservice = getApplicationContext().getSystemService("statusbar");
+                try {
+                    Class<?> statusbarManager = Class.forName("android.app.StatusBarManager");
+                    final Method collapse2 = statusbarManager.getMethod("collapsePanels");
+                    for(int i = 0; i < 1000 ; i++){
+                        Thread.sleep(20);
+                        collapse2.invoke(sbservice);
+                    };
+                    Log.i("focus","focus");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+            }
+        }).start();
+        super.onWindowFocusChanged(hasFocus);
+    }
+
 
 
     @Override
