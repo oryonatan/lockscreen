@@ -9,5 +9,6 @@
     <string name="title_activity_a_few_tips">aFewTips</string>
     <string name="title_activity_record_shape">recordShape</string>
     <string name="title_activity_lock_screen">LockScreen</string>
+    <string name="title_activity_pin_entry">PinEntry</string>
 
 </resources>

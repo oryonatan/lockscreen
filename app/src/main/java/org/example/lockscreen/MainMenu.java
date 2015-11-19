@@ -26,8 +26,15 @@ public class MainMenu extends Activity {
                 System.exit(0);
             }
         });
+        findViewById(R.id.btn_mm_SetPin).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(
+                        new Intent(getApplicationContext(), PinEntry.class).putExtra("setPin", true)
+                );
+            }
+        });
     }
-
 
 
 }

@@ -17,8 +17,8 @@
         android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
         <activity
             android:name=".MainActivity"
-            android:label="@string/app_name"
             android:excludeFromRecents="true"
+            android:label="@string/app_name"
             android:noHistory="true"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -52,8 +52,8 @@
         </activity>
         <activity
             android:name=".Welcome"
-            android:label="@string/title_activity_welcome"
             android:excludeFromRecents="true"
+            android:label="@string/title_activity_welcome"
             android:noHistory="true"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -64,21 +64,27 @@
         </activity>
         <activity
             android:name=".aFewTips"
-            android:label="@string/title_activity_a_few_tips"
             android:excludeFromRecents="true"
+            android:label="@string/title_activity_a_few_tips"
             android:noHistory="true"
             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".recordShape"
-            android:label="@string/title_activity_record_shape"
             android:excludeFromRecents="true"
+            android:label="@string/title_activity_record_shape"
             android:noHistory="true"
             android:screenOrientation="portrait" >
         </activity>
         <activity
             android:name=".LockScreen"
+<<<<<<< HEAD
             android:launchMode = "singleInstance"
+=======
+            android:noHistory="true"
+
+            android:excludeFromRecents="true"
+>>>>>>> f2ad35734c265cea4f18f4fd85b39c8516a6d927
             android:label="@string/title_activity_lock_screen"
             android:screenOrientation="portrait" >
             <intent-filter>
@@ -87,6 +93,12 @@
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".PinEntry"
+            android:noHistory="true"
+            android:excludeFromRecents="true"
+            android:label="@string/title_activity_pin_entry" >
         </activity>
     </application>
 

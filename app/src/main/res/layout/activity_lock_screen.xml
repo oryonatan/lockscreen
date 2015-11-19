@@ -37,4 +37,15 @@
         android:layout_marginBottom="19dp"
         android:text="Hold &amp; Gesture" />
 
+    <Button
+        android:background="@drawable/round_button_pin"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:textSize="15dp"
+        android:text="use PIN"
+        android:id="@+id/btn_ls_setPin"
+        android:layout_alignBottom="@+id/btn_ls_touchToUnlcok"
+        android:layout_toRightOf="@+id/analogClock"
+        android:layout_toEndOf="@+id/analogClock" />
+
 </RelativeLayout>
