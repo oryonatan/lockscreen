@@ -1,14 +1,18 @@
 package org.example.lockscreen;
 
-import android.app.Activity;
+import java.lang.reflect.Method;
+
+import android.content.Intent;
 import android.graphics.PixelFormat;
-import android.graphics.drawable.TransitionDrawable;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.app.Activity;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
 import android.text.Editable;
@@ -24,9 +28,11 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.util.ArrayList;
@@ -44,8 +50,6 @@ public class LockScreen extends Activity implements SensorEventListener {
     public View mLockScreenView;
     public View mPinEntryView;
     WindowManager.LayoutParams mParams;
-    private TransitionDrawable buttonTrans;
-    private TransitionDrawable backgroudTrans;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,13 +187,8 @@ public class LockScreen extends Activity implements SensorEventListener {
     private View.OnTouchListener otl_tryToUnlock = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            buttonTrans =
-                    (TransitionDrawable) mLockScreenView.findViewById(R.id.btn_ls_touchToUnlcok).getBackground();
-            backgroudTrans =
-                    (TransitionDrawable) mLockScreenView.findViewById(R.id.lockBackground).getBackground();
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
-                    buttonTrans.startTransition(3000);
                     //start gathring
                     sensorLog = new ArrayList<>();
                     sensingStartTime = 0;
@@ -203,13 +202,9 @@ public class LockScreen extends Activity implements SensorEventListener {
                     if (sensorLog.size() > 150) {
                         double[][] recordedGesture = GestureRecognizer.prepForComapre(sensorLog);
                         if (isCloseEnough(recordedGesture)) {
+                            //TODO: respond
                             mWindow.removeView(mLockScreenView);
                             finish();
-                        } else {
-                            buttonTrans.resetTransition();
-                            backgroudTrans.startTransition(330);
-                            backgroudTrans.reverseTransition(330);
-                            ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(new long[]{0, 150, 25, 150}, -1);
                         }
                     }
                     break;

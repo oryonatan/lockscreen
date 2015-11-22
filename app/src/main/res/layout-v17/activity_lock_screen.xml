@@ -7,15 +7,14 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".MainActivity"
-    android:id="@+id/lockBackground"
-    android:background="@drawable/trans_relative_layout_tored">
+    android:background="#ebe6e6">
 
     <TextClock
         android:textSize="40dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/textClock"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="21dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true" />
 
@@ -24,8 +23,7 @@
         android:layout_height="wrap_content"
         android:id="@+id/analogClock"
         android:layout_below="@+id/textClock"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="43dp" />
+        android:layout_centerHorizontal="true" />
 
     <Button
         android:layout_width="200dp"
