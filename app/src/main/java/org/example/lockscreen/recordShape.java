@@ -81,7 +81,7 @@ public class recordShape extends Activity implements SensorEventListener {
                 case MotionEvent.ACTION_DOWN:
                     trans =
                             (TransitionDrawable) findViewById(R.id.btn_rs_recordRoundButton).getBackground();
-                    trans.startTransition(2000);
+                    trans.startTransition(3000);
                     //start gathring
                     sensorLog = new ArrayList<>();
                     sensingStartTime = 0;

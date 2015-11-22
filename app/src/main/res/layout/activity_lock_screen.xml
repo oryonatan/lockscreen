@@ -21,11 +21,12 @@
         android:background="#9e3a3a"
         android:contentDescription="bla" />
 
-    <org.example.lockscreen.LockScreenView
+    <RelativeLayout
         android:id="@+id/lockscreen_forground_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#d5d5d5">
+        android:background="#d5d5d5"
+        >
     <Button
         android:onClick="unlockScreen"
         android:text="UNLOCK"
@@ -55,7 +56,7 @@
         android:layout_marginBottom="19dp"
         android:text="Hold &amp; Gesture" />
 
-    </org.example.lockscreen.LockScreenView>
+    </RelativeLayout>
 
     <Button
         android:background="@drawable/round_button_pin"
