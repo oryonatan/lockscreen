@@ -45,6 +45,4 @@ public class LockScreenService extends Service {
         unregisterReceiver(receiver);
         super.onDestroy();
     }
-
-
 }

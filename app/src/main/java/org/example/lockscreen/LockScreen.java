@@ -1,11 +1,11 @@
 package org.example.lockscreen;
 
-<<<<<<< HEAD
+import java.lang.reflect.Method;
+
+import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.app.ActivityManager;
 import android.content.Context;
-=======
-import android.content.Intent;
->>>>>>> f2ad35734c265cea4f18f4fd85b39c8516a6d927
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -13,57 +13,174 @@ import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.app.Activity;
+import android.os.Vibrator;
+import android.support.annotation.NonNull;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.util.Pair;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.Toast;
+import android.widget.EditText;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
-import static android.view.WindowManager.LayoutParams.TYPE_SYSTEM_ALERT;
-
 
 public class LockScreen extends Activity implements SensorEventListener {
+    public boolean inPINscreen = false;
     private ArrayList<Pair<Long, double[]>> sensorLog;
     private SensorManager sensorManager;
     private Sensor accelerometer;
     private long sensingStartTime = 0;
-    private HomeKeyLocker mHomeKeyLocker;
-
+    private boolean holdScreen = true;
+    public LayoutInflater mInflater;
+    public WindowManager mWindow;
+    public View mLockScreenView;
+    public View mPinEntryView;
+    WindowManager.LayoutParams mParams;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        File fromPINflag = new File(getFilesDir(), "pinstarted");
+        boolean PINexists = new File(getApplicationContext().getFilesDir(), "PIN").exists();
         File firstCurve = new File(this.getFilesDir(), MainActivity.SHAPES_DIR + "c0");
-        if (!getIntent().hasExtra("fromlockscreen")||
-                ! firstCurve.exists()){
-            finish();
+        if (!PINexists || !firstCurve.exists() ||
+                (!getIntent().hasExtra("fromlockscreen")
+//                        && !fromPINflag.exists()
+                )) {
+            MainActivity.unlockScreen();
         }
-        setContentView(R.layout.activity_lock_screen);
-        this.getWindow().setType(WindowManager.LayoutParams.TYPE_KEYGUARD_DIALOG);
+        if (fromPINflag.exists()) {
+            fromPINflag.delete();
+        }
+        Log.i("oncreate", "created");
+        holdScreen = true;
+
+        mParams = new WindowManager.LayoutParams(
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.MATCH_PARENT,
+                WindowManager.LayoutParams.TYPE_PHONE,
+                WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE
+                        | WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED
+                        | WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD,
+                PixelFormat.TRANSLUCENT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            mParams.flags = WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS;
+        } else {
+            mParams.flags = WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS;
+        }
+
+
+        mInflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
+        mWindow = (WindowManager) getSystemService(WINDOW_SERVICE);
+        mLockScreenView = mInflater.inflate(R.layout.activity_lock_screen, null);
+        mPinEntryView = mInflater.inflate(R.layout.activity_pin_entry, null);
+
+        mWindow.addView(mLockScreenView, mParams);
+
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         accelerometer = sensorManager.getDefaultSensor(Sensor.TYPE_LINEAR_ACCELERATION);
-        findViewById(R.id.btn_ls_touchToUnlcok).setOnTouchListener(otl_tryToUnlock);
-        Button goToPin = (Button)findViewById(R.id.btn_ls_setPin);
-        goToPin.setOnClickListener(new View.OnClickListener() {
+        mLockScreenView.findViewById(R.id.btn_ls_touchToUnlcok).setOnTouchListener(otl_tryToUnlock);
+        Button goToPin = (Button) mLockScreenView.findViewById(R.id.btn_ls_setPin);
+        goToPin.setOnClickListener(ocl_startPIN());
+
+    }
+
+    @NonNull
+    public View.OnClickListener ocl_pinOnClick() {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                startActivity(
-                        new Intent(getApplicationContext(),PinEntry.class).putExtra("tryPin",true)
-                );
+                EditText pinEntry = (EditText) mPinEntryView.findViewById(R.id.et_pe_pin);
+                pinEntry.setText(pinEntry.getText() + ((Button) v).getText().toString());
             }
-        });
+        };
+    }
+
+    @NonNull
+    public View.OnClickListener ocl_startPIN() {
+        return new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                inPINscreen = true;
+                try {
+                    new File(getApplicationContext().getFilesDir(), "pinstarted").createNewFile();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                mWindow.removeView(mLockScreenView);
+                mWindow.addView(mPinEntryView, mParams);
+                ((Button) mPinEntryView.findViewById(R.id.btn_pe_backToGesture)).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        mWindow.removeView(mPinEntryView);
+                        mWindow.addView(mLockScreenView, mParams);
+                        inPINscreen = false;
+                    }
+                });
+                final EditText pinEntry = (EditText) mPinEntryView.findViewById(R.id.et_pe_pin);
+                View[] pinButtons = {
+                        mPinEntryView.findViewById(R.id.btn_pe_bt1),
+                        mPinEntryView.findViewById(R.id.btn_pe_bt2),
+                        mPinEntryView.findViewById(R.id.btn_pe_bt3),
+                        mPinEntryView.findViewById(R.id.btn_pe_bt4),
+                        mPinEntryView.findViewById(R.id.btn_pe_bt5),
+                        mPinEntryView.findViewById(R.id.btn_pe_bt6),
+                        mPinEntryView.findViewById(R.id.btn_pe_bt7),
+                        mPinEntryView.findViewById(R.id.btn_pe_bt8),
+                        mPinEntryView.findViewById(R.id.btn_pe_bt9),
+                        mPinEntryView.findViewById(R.id.btn_pe_bt0)};
+                for (View btn : pinButtons) {
+                    ((Button) btn).setOnClickListener(ocl_pinOnClick());
+                }
+
+                pinEntry.addTextChangedListener(new TextWatcher() {
+                    @Override
+                    public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                    }
+
+                    @Override
+                    public void onTextChanged(CharSequence s, int start, int before, int count) {
+                    }
+
+                    @Override
+                    public void afterTextChanged(Editable s) {
+                        if (s.length() < 4)
+                            return;//do nothing
+                        try {
+                            File pinFile = new File(getApplicationContext().getFilesDir(), "PIN");
+                            BufferedReader in = new BufferedReader(new FileReader(pinFile));
+                            String pin_str = in.readLine();
+
+                            if (pin_str.equals(s.toString())) {
+                                mWindow.removeView(mPinEntryView);
+                                finish();
+                            } else {
+                                ((Vibrator) getSystemService(VIBRATOR_SERVICE)).vibrate(new long[]{0, 150, 25, 150}, -1);
+                                pinEntry.setText("");
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+            }
+
+        };
     }
 
 
@@ -86,6 +203,7 @@ public class LockScreen extends Activity implements SensorEventListener {
                         double[][] recordedGesture = GestureRecognizer.prepForComapre(sensorLog);
                         if (isCloseEnough(recordedGesture)) {
                             //TODO: respond
+                            mWindow.removeView(mLockScreenView);
                             finish();
                         }
                     }
@@ -128,7 +246,7 @@ public class LockScreen extends Activity implements SensorEventListener {
             }
             System.out.println("Original distance " + Double.toString(initialDist));
             System.out.println("Found distance " + Double.toString(avgDist));
-            System.out.println("Ratio" + Double.toString( avgDist/initialDist));
+            System.out.println("Ratio" + Double.toString(avgDist / initialDist));
 
             if (avgDist / initialDist < 1.6)
                 return true;
@@ -154,81 +272,23 @@ public class LockScreen extends Activity implements SensorEventListener {
 
 
     @Override
-    protected void onPause() {
-        super.onPause();
-
-        ActivityManager activityManager = (ActivityManager) getApplicationContext()
-                .getSystemService(Context.ACTIVITY_SERVICE);
-
-        activityManager.moveTaskToFront(getTaskId(), 0);
-    }
-
-    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if(keyCode == KeyEvent.KEYCODE_HOME)
-        {
+        if (keyCode == KeyEvent.KEYCODE_HOME) {
             Log.i("Home Button", "Clicked");
         }
         if (keyCode == KeyEvent.KEYCODE_BACK) {
-            return true;
+            if (inPINscreen) {
+                mWindow.removeView(mPinEntryView);
+                mWindow.addView(mLockScreenView, mParams);
+                inPINscreen = false;
+            }
         }
         return false;
     }
 
 
     @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        new Thread(new Runnable() {
-
-            @Override
-            public void run() {
-                Object sbservice = getApplicationContext().getSystemService("statusbar");
-                try {
-                    Class<?> statusbarManager = Class.forName("android.app.StatusBarManager");
-                    final Method collapse2 = statusbarManager.getMethod("collapsePanels");
-                    for(int i = 0; i < 1000 ; i++){
-                        Thread.sleep(20);
-                        collapse2.invoke(sbservice);
-                    };
-                    Log.i("focus","focus");
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-
-            }
-        }).start();
-        super.onWindowFocusChanged(hasFocus);
-    }
-
-
-
-    @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
-    }
 
-    @Override
-    public void onBackPressed() {
-        return;
-    }
-
-
-
-    public void makeFullScreen() {
-        this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        if(Build.VERSION.SDK_INT < 19) { //View.SYSTEM_UI_FLAG_IMMERSIVE is only on API 19+
-            this.getWindow().getDecorView()
-                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
-        } else {
-            this.getWindow().getDecorView()
-                    .setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE);
-        }
-    }
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mHomeKeyLocker =null;
     }
 }

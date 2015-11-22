@@ -103,7 +103,13 @@ public class recordShape extends Activity implements SensorEventListener {
                                 double dist = getInitialDistance();
                                 new File(getApplicationContext().getFilesDir(),MainActivity.SHAPES_DIR + "d" + Double.toString(dist)).createNewFile();
                             }catch (Exception e){}
-                            startActivity(new Intent(getApplicationContext(),MainMenu.class));
+                            if ( new File(getApplicationContext().getFilesDir(), "PIN").exists()){
+                                startActivity(new Intent(getApplicationContext(),MainMenu.class).putExtra("setPin",true));
+                            }
+                            else {
+                                startActivity(new Intent(getApplicationContext(), PinEntry.class).putExtra("setPin", true));
+                            }
+                            //startActivity(new Intent(getApplicationContext(),MainMenu.class));
                         }
                     }
                     else {

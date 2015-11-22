@@ -6,7 +6,8 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
-    tools:context=".MainActivity">
+    tools:context=".MainActivity"
+    android:background="#ebe6e6">
 
     <TextClock
         android:textSize="40dp"
@@ -37,14 +38,13 @@
 
     <Button
         android:background="@drawable/round_button_pin"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:textSize="15dp"
-        android:text="use PIN"
         android:id="@+id/btn_ls_setPin"
-        android:layout_alignBottom="@+id/btn_ls_touchToUnlcok"
-        android:layout_toRightOf="@+id/textClock"
-        android:layout_toEndOf="@+id/textClock" />
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 
 </RelativeLayout>

@@ -116,6 +116,7 @@ public class GestureRecognizer {
 
 
 
+        System.out.println("Dist: " + D.getEntry(D.getRowDimension() - 1, D.getColumnDimension() - 1));
         Double dist = D.getEntry(D.getRowDimension() - 1, D.getColumnDimension() - 1);
 
 

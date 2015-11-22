@@ -7,12 +7,14 @@
     <uses-permission android:name="android.permission.DISABLE_KEYGUARD" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.VIBRATE"
+    />
 
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@"
         android:label="@string/app_name"
         android:theme="@android:style/Theme.Light.NoTitleBar.Fullscreen" >
         <activity
@@ -43,9 +45,10 @@
             android:excludeFromRecents="true"
             android:label="@string/title_activity_main_menu"
             android:noHistory="true"
+            android:launchMode = "singleInstance"
             android:screenOrientation="portrait" >
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
@@ -78,27 +81,26 @@
         </activity>
         <activity
             android:name=".LockScreen"
-<<<<<<< HEAD
             android:launchMode = "singleInstance"
-=======
-            android:noHistory="true"
-
             android:excludeFromRecents="true"
->>>>>>> f2ad35734c265cea4f18f4fd85b39c8516a6d927
             android:label="@string/title_activity_lock_screen"
             android:screenOrientation="portrait" >
             <intent-filter>
-
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
         <activity
             android:name=".PinEntry"
-            android:noHistory="true"
+            android:screenOrientation="portrait"
             android:excludeFromRecents="true"
-            android:label="@string/title_activity_pin_entry" >
+            android:noHistory="true"
+            android:label="@string/title_activity_pin_entry"
+            android:launchMode = "singleInstance">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
     </application>
 
